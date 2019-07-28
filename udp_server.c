@@ -6,44 +6,46 @@
 #include<unistd.h>
 #include<stdlib.h>
 
-#define PORT 55555
+#define BUF_LEN 1500
 
-int main(int argc, char *argv[])
+int configure(int port)
 {
-    char buf[1500];
-
     int sockfd;
-    int len;
-    int len2;
-
-    struct sockaddr_in servaddr;
-    struct sockaddr_in cliaddr;
-
     if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        printf("Error creating socket\n");
+        perror("Error creating socket\n");
         exit(0);
     }
-
     printf("Socket has been creating\n");
-    memset(&servaddr, 0, sizeof(servaddr));
+
+    struct sockaddr_in servaddr;
 
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(PORT);
+    servaddr.sin_port = htons(port);
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if(bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
     {
-        printf("Error binding socket\n");
+        perror("Error binding socket\n");
         exit(0);
     }
-
     printf("Socket has bound\n");
+
+    return sockfd;
+}
+
+void run(int sockfd)
+{
+    char buf[BUF_LEN];
+    int len;
+    int len2;
+
+    struct sockaddr_in cliaddr;
+
     len = sizeof(cliaddr);
 
     while (1)
     {
-        //strcpy(buf, " ");
 	len2 = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
 
         buf[len2] = '\0';
@@ -51,5 +53,13 @@ int main(int argc, char *argv[])
         printf("Received: '%s' from client\n", buf);
         sendto(sockfd, buf, len2, 0, (struct sockaddr *)&cliaddr, len);
     }
+}
+
+/*
+int main(int argc, char *argv[])
+{
+    int sockfd = configure(55555);
+    run(sockfd);
     return 0;
 }
+*/

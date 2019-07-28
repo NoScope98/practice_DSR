@@ -1,0 +1,2 @@
+all:
+	gcc client.c udp_client.c tcp_client.c -o client

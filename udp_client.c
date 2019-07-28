@@ -7,36 +7,47 @@
 #include<unistd.h>
 #include<stdlib.h>
 
-#define PORT 55555
 #define ADDRESS "127.0.0.1"
+#define BUF_LEN 1500
 
-int main(int argc, char *argv[])
+int sock()
 {
-    char buf[1500];
     int sockfd;
-    int len;
-
-    struct sockaddr_in serv;
-    struct sockaddr_in cliaddr;
 
     if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        printf("Error creating socket\n");
+        perror("Error creating socket\n");
         exit(0);
     }
-
     printf("Socket has been created\n");
-    memset(&serv, 0, sizeof(serv));
+
+    return sockfd;
+}
+
+struct sockaddr_in configure(int port, char *address)
+{
+    struct sockaddr_in serv;
+
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(PORT);
-    serv.sin_addr.s_addr = inet_addr(ADDRESS);
+    serv.sin_port = htons(port);
+    serv.sin_addr.s_addr = inet_addr(address);
+
+    return serv;
+}
+
+void run(int sockfd, struct sockaddr_in *serv)
+{
+    char buf[BUF_LEN];
+    int len;
+
+    struct sockaddr_in cliaddr;
 
     while (1)
     {
         printf("Enter the message: ");
         fgets(buf, sizeof(buf), stdin);
 
-        len = sendto(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&serv, sizeof(serv));
+        len = sendto(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)serv, sizeof(*serv));
 
         recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr *)&cliaddr, &len);
 
@@ -45,5 +56,14 @@ int main(int argc, char *argv[])
     }
 
     close(sockfd);
+}
+
+/*
+int main(int argc, char *argv[])
+{
+    int sockfd = sock();
+    struct sockaddr_in serv = configure(55555, "127.0.0.1");
+    run(sockfd, &serv);
     return 0;
 }
+*/

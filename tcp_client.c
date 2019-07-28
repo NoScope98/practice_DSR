@@ -7,36 +7,37 @@
 #include<unistd.h>
 #include<stdlib.h>
 
-#define PORT 55555
-#define ADDRESS "127.0.0.1"
 #define BUF_LEN 1500
 
-int main(int argc, char *argv[])
+int configure_tcp_client(int port, char *address)
 {
-    char buf[BUF_LEN];
-    char message[BUF_LEN];
     int sockfd;
-
     struct sockaddr_in serv;
 
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf("Error creating socket\n");
+        perror("Error creating socket\n");
         exit(0);
     }
-
     printf("Socket has been created\n");
-    memset(&serv, 0, sizeof(serv));
 
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(PORT);
-    serv.sin_addr.s_addr = inet_addr(ADDRESS);
+    serv.sin_port = htons(port);
+    serv.sin_addr.s_addr = inet_addr(address);
 
     if (connect(sockfd, (struct sockaddr *)&serv, sizeof(serv)) < 0)
     {
         perror("Error connect\n");
         exit(0);
     }
+
+    return sockfd;
+}
+
+void run_tcp_client(int sockfd)
+{
+    char buf[BUF_LEN];
+    char message[BUF_LEN];
 
     while (1)
     {
@@ -48,7 +49,14 @@ int main(int argc, char *argv[])
 
         printf("Received: %s", buf);
     }
-
     close(sockfd);
+}
+
+/*
+int main(int argc, char *argv[])
+{
+    int sockfd = configure(55555, "127.0.0.1");
+    run(sockfd);
     return 0;
 }
+*/
