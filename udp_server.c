@@ -8,7 +8,7 @@
 
 #define BUF_LEN 1500
 
-int configure(int port)
+int configure_udp_server(int port)
 {
     int sockfd;
     if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -34,7 +34,7 @@ int configure(int port)
     return sockfd;
 }
 
-void run(int sockfd)
+void run_udp_server(int sockfd)
 {
     char buf[BUF_LEN];
     int len;

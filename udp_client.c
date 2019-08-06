@@ -10,7 +10,7 @@
 #define ADDRESS "127.0.0.1"
 #define BUF_LEN 1500
 
-int sock()
+int create_udp_socket()
 {
     int sockfd;
 
@@ -24,7 +24,7 @@ int sock()
     return sockfd;
 }
 
-struct sockaddr_in configure(int port, char *address)
+struct sockaddr_in configure_udp_client(int port, char *address)
 {
     struct sockaddr_in serv;
 
@@ -35,7 +35,7 @@ struct sockaddr_in configure(int port, char *address)
     return serv;
 }
 
-void run(int sockfd, struct sockaddr_in *serv)
+void run_udp_client(int sockfd, struct sockaddr_in *serv)
 {
     char buf[BUF_LEN];
     int len;
