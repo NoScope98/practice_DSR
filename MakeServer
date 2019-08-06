@@ -1,2 +1,0 @@
-all:
-	gcc server.c udp_server.c tcp_server.c -o server
