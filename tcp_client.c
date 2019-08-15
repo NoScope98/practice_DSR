@@ -51,12 +51,3 @@ void run_tcp_client(int sockfd)
     }
     close(sockfd);
 }
-
-/*
-int main(int argc, char *argv[])
-{
-    int sockfd = configure(55555, "127.0.0.1");
-    run(sockfd);
-    return 0;
-}
-*/
