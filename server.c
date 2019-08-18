@@ -13,7 +13,7 @@ enum Protocol
 
 void usage()
 {
-    printf("Usage -u for UDP, -t for TCP, -p <PORT> for port, -a <ADDRESS> for address\n");
+    printf("Usage -u for UDP, -t for TCP, -p <PORT> for port\n");
 }
 
 int main(int argc, char *argv[])

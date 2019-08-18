@@ -5,8 +5,6 @@
 #include<string.h>
 #include<unistd.h>
 #include<stdlib.h>
-#include <fcntl.h>
-#include <sys/time.h>
 
 #define BUF_LEN 1500
 
@@ -40,30 +38,26 @@ int configure_tcp_server(int port)
 void run_tcp_server(int listener)
 {
     char buf[BUF_LEN];
-    //printf("Start buf = %s\n", buf);
     int len;
     int i;
     int j;
 
-    fd_set master;
+    fd_set active_fds;
     fd_set read_fds;
     int fdmax;
 
     int newfd;
 
-    //struct timeval timeout;
-    //timeout.tv_sec = 100;
-    //timeout.tv_usec = 0;
-
     listen(listener, 10);
 
-    FD_SET(listener, &master);
+    FD_ZERO (&active_fds);
+    FD_SET(listener, &active_fds);
     fdmax = listener;
 
     while (1)
     {
-        read_fds = master;
-        if (select(fdmax + 1, &read_fds, NULL, NULL, NULL) <= 0)
+        read_fds = active_fds;
+        if (select(fdmax + 1, &read_fds, NULL, NULL, NULL) < 0)
         {
             perror("Error select\n");
             exit(0);
@@ -72,34 +66,30 @@ void run_tcp_server(int listener)
         {
             if (FD_ISSET(i, &read_fds))
             {
-                //printf("consist of \"i\" = %d\n", i);
                 if (i == listener)
                 {
-                    if (newfd = accept(listener, NULL, NULL) < 0)
+                    if ((newfd = accept(listener, NULL, NULL)) < 0)
                     {
                         perror("Error accept\n");
                         exit(0);
                     }
                     else
                     {
-                        //printf("Value newfd = %d\n", newfd);
-                        FD_SET(newfd, &master);
+                        FD_SET(newfd, &active_fds);
                         if (newfd > fdmax)
                         {
                             fdmax = newfd;
                         }
                         printf("New connection!\n");
-                        //printf("Message: %s\n", buf);
                     }
                 }
                 else
                 {
-                    //printf("HERE!\n");
                     if (len = recv(i, buf, sizeof(buf), 0) <= 0)
                     {
-                        perror("Error recv\n");
+                        //perror("Error recv\n");
                         close(i);
-                        FD_CLR(i, &master);
+                        FD_CLR(i, &active_fds);
                     }
                     else
                     {
